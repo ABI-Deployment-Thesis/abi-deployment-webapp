@@ -12,7 +12,7 @@ function ModelManagement() {
   const fetchModels = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get('http://127.0.0.1:3001/models', {
+      const response = await axios.get('http://127.0.0.1:3002/models', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

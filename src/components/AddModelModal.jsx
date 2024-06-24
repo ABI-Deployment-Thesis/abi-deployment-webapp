@@ -53,7 +53,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
 
     const token = localStorage.getItem('token');
     try {
-      await axios.post('http://127.0.0.1:3001/model', formData, {
+      await axios.post('http://127.0.0.1:3002/models', formData, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

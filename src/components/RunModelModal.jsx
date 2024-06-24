@@ -13,7 +13,7 @@ const RunModelModal = ({ show, handleClose, refreshModelRuns }) => {
     const fetchModels = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.get('http://127.0.0.1:3001/models', {
+        const response = await axios.get('http://127.0.0.1:3002/models', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -34,7 +34,7 @@ const RunModelModal = ({ show, handleClose, refreshModelRuns }) => {
       const token = localStorage.getItem('token');
       if (selectedModel) {
         try {
-          const response = await axios.get(`http://127.0.0.1:3001/model/${selectedModel}`, {
+          const response = await axios.get(`http://127.0.0.1:3002/models/${selectedModel}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -84,7 +84,7 @@ const RunModelModal = ({ show, handleClose, refreshModelRuns }) => {
     }));
 
     try {
-      await axios.post('http://127.0.0.1:3002/model-runs', {
+      await axios.post('http://127.0.0.1:3003/model-runs', {
         model_id: selectedModel,
         input_features: inputFeatures,
       }, {

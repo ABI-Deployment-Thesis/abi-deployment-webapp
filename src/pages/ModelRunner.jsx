@@ -19,7 +19,7 @@ function ModelRunner() {
   const fetchModelRuns = async (modelId = '') => {
     const token = localStorage.getItem('token');
     try {
-      const url = modelId ? `http://127.0.0.1:3002/model-runs?model_id=${modelId}` : 'http://127.0.0.1:3002/model-runs';
+      const url = modelId ? `http://127.0.0.1:3003/model-runs?model_id=${modelId}` : 'http://127.0.0.1:3003/model-runs';
       const response = await axios.get(url, {
         headers: {
           'Authorization': `Bearer ${token}`

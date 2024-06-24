@@ -10,7 +10,7 @@ const ModelRunDetailsModal = ({ show, handleClose, runId }) => {
     const fetchRunDetails = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.get(`http://127.0.0.1:3002/model-runs/${runId}`, {
+        const response = await axios.get(`http://127.0.0.1:3003/model-runs/${runId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
