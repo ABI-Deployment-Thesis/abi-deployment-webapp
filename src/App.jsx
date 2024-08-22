@@ -1,10 +1,10 @@
-// src/App.js
+// src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import SignIn from './components/SignIn';
-import ModelManagement from './pages/ModelManagement';
-import ModelRunner from './pages/ModelRunner';
-import Navbar from './components/Navbar';
+import SignIn from './pages/SignIn/SignIn';
+import ModelManagement from './pages/ModelManagement/ModelManagement';
+import ModelRunner from './pages/ModelRunner/ModelRunner';
+import Navbar from './components/Navbar/Navbar';
 
 function App() {
   const token = localStorage.getItem('token');

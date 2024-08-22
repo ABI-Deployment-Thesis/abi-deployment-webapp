@@ -1,18 +1,22 @@
-// src/pages/ModelManagement.js
+// src/pages/ModelManagement/ModelManagement.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import AddModelModal from '../components/AddModelModal';
+import AddModelModal from '../../components/AddModelModal/AddModelModal';
 import { Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../../config/config';
 
 function ModelManagement() {
   const [models, setModels] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'desc' });
 
+  const navigate = useNavigate();
+
   const fetchModels = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get('http://127.0.0.1:3002/models', {
+      const response = await axios.get(API_ENDPOINTS.MODELS, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -48,6 +52,10 @@ function ModelManagement() {
     return 0;
   });
 
+  const handleRowClick = (modelId) => {
+    navigate(`/model-runner?model_id=${modelId}`); // Use navigate instead of history.push
+  };
+
   return (
     <div className="container">
       <h1>Model Management</h1>
@@ -63,7 +71,7 @@ function ModelManagement() {
         </thead>
         <tbody>
           {sortedModels.map(model => (
-            <tr key={model._id}>
+            <tr key={model._id} onClick={() => handleRowClick(model._id)} style={{ cursor: 'pointer' }}>
               <td>{model.name}</td>
               <td>{model.type}</td>
               <td>{model.engine}</td>

@@ -1,6 +1,8 @@
-// src/components/SignIn.js
+// src/components/SignIn/SignIn.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { API_ENDPOINTS } from '../../config/config';
 
 function SignIn() {
   const [email, setEmail] = useState('');
@@ -9,17 +11,20 @@ function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch('http://localhost:3001/signin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
 
-    if (response.status === 200) {
-      const data = await response.json();
-      localStorage.setItem('token', data.message);
-      navigate('/model-management');
-    } else {
+    try {
+      const response = await axios.post(API_ENDPOINTS.SIGNIN, { email, password });
+
+      if (response.status === 200) {
+        const data = response.data;
+        localStorage.setItem('token', data.message);
+        navigate('/model-management');
+        window.location.reload();
+      } else {
+        alert('Sign in failed');
+      }
+    } catch (error) {
+      console.error('Error during sign in:', error);
       alert('Sign in failed');
     }
   };

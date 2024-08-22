@@ -1,0 +1,6 @@
+.custom-modal-width {
+  max-width: 80%;
+  /* Adjust the percentage as needed */
+  width: 800px;
+  /* Or set a fixed width */
+}
