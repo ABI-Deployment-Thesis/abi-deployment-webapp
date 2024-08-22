@@ -13,12 +13,10 @@ const ModelRunDetailsModal = ({ show, handleClose, runId }) => {
     const fetchRunDetails = async () => {
       const token = localStorage.getItem('token');
       try {
-        // Fetch run details
         const { data: runData } = await axios.get(`${API_ENDPOINTS.MODEL_RUNS}/${runId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // Fetch model details to get the type
         const { data: modelData } = await axios.get(`${API_ENDPOINTS.MODEL}/${runData.model_id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
