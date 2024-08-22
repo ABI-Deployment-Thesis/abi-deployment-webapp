@@ -55,39 +55,27 @@ function ModelRunner() {
     }
   };
 
-  const handleShowModal = () => {
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
+  const handleShowModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
   const handleRowClick = (runId) => {
     setSelectedRunId(runId);
     setShowDetailsModal(true);
   };
-
   const handleCloseDetailsModal = () => {
     setShowDetailsModal(false);
     setSelectedRunId(null);
   };
 
   const handleSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
+    setSortConfig(prevConfig => ({
+      key,
+      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc'
+    }));
   };
 
   const sortedModelRuns = [...modelRuns].sort((a, b) => {
-    if (a[sortConfig.key] < b[sortConfig.key]) {
-      return sortConfig.direction === 'asc' ? -1 : 1;
-    }
-    if (a[sortConfig.key] > b[sortConfig.key]) {
-      return sortConfig.direction === 'asc' ? 1 : -1;
-    }
+    if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1;
     return 0;
   });
 
@@ -109,7 +97,7 @@ function ModelRunner() {
             <tr key={run._id} onClick={() => handleRowClick(run._id)}>
               <td>{run.model_name}</td>
               <td>{new Date(run.updatedAt).toLocaleString()}</td>
-              <td>{(new Date(run.updatedAt) - new Date(run.createdAt)) / 1000}</td>
+              <td>{Math.round((new Date(run.updatedAt) - new Date(run.createdAt)) / 1000)}</td>
               <td>{getStateIcon(run.state)}</td>
             </tr>
           ))}

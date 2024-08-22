@@ -24,13 +24,14 @@ function AddModelModal({ show, handleClose, refreshModels }) {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     const allowedExtensions = ['.py', '.sav', '.rds', '.zip'];
-    const fileExtension = selectedFile ? selectedFile.name.split('.').pop() : '';
-    if (allowedExtensions.includes(`.${fileExtension}`)) {
+    const fileExtension = selectedFile ? `.${selectedFile.name.split('.').pop()}` : '';
+
+    if (allowedExtensions.includes(fileExtension)) {
       setFile(selectedFile);
       setError(null);
     } else {
       setFile(null);
-      setError('Only .py and .sav files are allowed.');
+      setError('Only .py, .sav, .rds, and .zip files are allowed.');
     }
   };
 
@@ -38,45 +39,37 @@ function AddModelModal({ show, handleClose, refreshModels }) {
     e.preventDefault();
     const formData = new FormData();
     formData.append('file', file);
-
-    const featuresWithOrder = features.map((feature, index) => ({
-      ...feature,
-      order: index + 1
-    }));
-
-    formData.append('dependencies', JSON.stringify(dependencies));
-    formData.append('type', type);
     formData.append('name', name);
+    formData.append('type', type);
     formData.append('engine', engine);
+
     if (engine === 'docker') {
       formData.append('language', language);
     }
+
     if (type === 'predictive') {
-      formData.append('features', JSON.stringify(featuresWithOrder));
+      formData.append('features', JSON.stringify(features.map((feature, index) => ({ ...feature, order: index + 1 }))));
       if (engine === 'docker' && language === 'Python3') {
         formData.append('serialization', serialization);
       }
     }
 
-    const token = localStorage.getItem('token');
+    formData.append('dependencies', JSON.stringify(dependencies));
+
     try {
-      await axios.post(`${API_ENDPOINTS.MODELS}/${type}/${engine}/${language.replace(/\d+/g, '')}`, formData, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${API_ENDPOINTS.MODELS}/${type}/${engine}/${language.replace(/\d+/g, '')}`, formData, {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       refreshModels();
       handleClose();
     } catch (error) {
-      if (error.response && error.response.data) {
-        setError(
-          Array.isArray(error.response.data.error)
-            ? error.response.data.error.map(err => err.msg).join(', ')
-            : error.response.data.error
-        );
-      } else {
-        setError('An unexpected error occurred.');
-      }
+      const errorMessage = error.response?.data?.error;
+      setError(
+        Array.isArray(errorMessage)
+          ? errorMessage.map(err => err.msg).join(', ')
+          : errorMessage || 'An unexpected error occurred.'
+      );
     }
   };
 
@@ -119,7 +112,6 @@ function AddModelModal({ show, handleClose, refreshModels }) {
             </Form.Group>
           )}
 
-          {/* Conditional rendering for Serialization */}
           {type === 'predictive' && engine === 'docker' && language === 'Python3' && (
             <Form.Group className="mb-3">
               <Form.Label>Serialization</Form.Label>
@@ -130,12 +122,11 @@ function AddModelModal({ show, handleClose, refreshModels }) {
             </Form.Group>
           )}
 
-          {/* Conditional rendering for Features */}
           {type === 'predictive' && (
             <Form.Group className="mb-3">
               <Form.Label>Features</Form.Label>
               {features.map((feature, index) => (
-                <div key={index} className="d-flex mb-2">
+                <div key={index} className="d-flex align-items-center mb-2">
                   <Form.Control
                     type="text"
                     placeholder="Name"
@@ -146,6 +137,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
                       setFeatures(newFeatures);
                     }}
                     required
+                    className="me-2"
                   />
                   <Form.Select
                     value={feature.type}
@@ -155,6 +147,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
                       setFeatures(newFeatures);
                     }}
                     required
+                    className="me-2"
                   >
                     <option value="int">int</option>
                     <option value="float">float</option>
@@ -171,7 +164,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
           <Form.Group className="mb-3">
             <Form.Label>Dependencies</Form.Label>
             {dependencies.map((dependency, index) => (
-              <div key={index} className="d-flex mb-2">
+              <div key={index} className="d-flex align-items-center mb-2">
                 <Form.Control
                   type="text"
                   placeholder="Library"
@@ -182,6 +175,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
                     setDependencies(newDependencies);
                   }}
                   required
+                  className="me-2"
                 />
                 <Form.Control
                   type="text"
@@ -193,6 +187,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
                     setDependencies(newDependencies);
                   }}
                   required
+                  className="me-2"
                 />
                 <Button variant="danger" onClick={() => handleRemoveDependency(index)}>Remove</Button>
               </div>
@@ -205,9 +200,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
             <Form.Control type="file" onChange={handleFileChange} required />
           </Form.Group>
 
-          <Button variant="primary" type="submit">
-            Submit
-          </Button>
+          <Button variant="primary" type="submit">Submit</Button>
         </Form>
       </Modal.Body>
     </Modal>
