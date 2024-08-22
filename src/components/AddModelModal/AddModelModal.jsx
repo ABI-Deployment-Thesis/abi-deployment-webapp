@@ -1,13 +1,15 @@
-// src/components/AddModelModal.js
+// src/components/AddModelModal/AddModelModal.jsx
 import React, { useState } from 'react';
 import { Modal, Button, Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../../config/config';
 
 function AddModelModal({ show, handleClose, refreshModels }) {
   const [name, setName] = useState('');
   const [type, setType] = useState('predictive');
   const [engine, setEngine] = useState('docker');
   const [language, setLanguage] = useState('Python3');
+  const [serialization, setSerialization] = useState('joblib');
   const [features, setFeatures] = useState([{ name: '', type: 'int' }]);
   const [dependencies, setDependencies] = useState([{ library: '', version: '' }]);
   const [file, setFile] = useState(null);
@@ -21,7 +23,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    const allowedExtensions = ['.py', '.sav'];
+    const allowedExtensions = ['.py', '.sav', '.rds', '.zip'];
     const fileExtension = selectedFile ? selectedFile.name.split('.').pop() : '';
     if (allowedExtensions.includes(`.${fileExtension}`)) {
       setFile(selectedFile);
@@ -42,7 +44,6 @@ function AddModelModal({ show, handleClose, refreshModels }) {
       order: index + 1
     }));
 
-    formData.append('features', JSON.stringify(featuresWithOrder));
     formData.append('dependencies', JSON.stringify(dependencies));
     formData.append('type', type);
     formData.append('name', name);
@@ -50,10 +51,16 @@ function AddModelModal({ show, handleClose, refreshModels }) {
     if (engine === 'docker') {
       formData.append('language', language);
     }
+    if (type === 'predictive') {
+      formData.append('features', JSON.stringify(featuresWithOrder));
+      if (engine === 'docker' && language === 'Python3') {
+        formData.append('serialization', serialization);
+      }
+    }
 
     const token = localStorage.getItem('token');
     try {
-      await axios.post('http://127.0.0.1:3002/models', formData, {
+      await axios.post(`${API_ENDPOINTS.MODELS}/${type}/${engine}/${language.replace(/\d+/g, '')}`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -112,39 +119,54 @@ function AddModelModal({ show, handleClose, refreshModels }) {
             </Form.Group>
           )}
 
-          <Form.Group className="mb-3">
-            <Form.Label>Features</Form.Label>
-            {features.map((feature, index) => (
-              <div key={index} className="d-flex mb-2">
-                <Form.Control
-                  type="text"
-                  placeholder="Name"
-                  value={feature.name}
-                  onChange={(e) => {
-                    const newFeatures = [...features];
-                    newFeatures[index].name = e.target.value;
-                    setFeatures(newFeatures);
-                  }}
-                  required
-                />
-                <Form.Select
-                  value={feature.type}
-                  onChange={(e) => {
-                    const newFeatures = [...features];
-                    newFeatures[index].type = e.target.value;
-                    setFeatures(newFeatures);
-                  }}
-                  required
-                >
-                  <option value="int">int</option>
-                  <option value="float">float</option>
-                  <option value="boolean">bool</option>
-                </Form.Select>
-                <Button variant="danger" onClick={() => handleRemoveFeature(index)}>Remove</Button>
-              </div>
-            ))}
-            <Button variant="primary" onClick={handleAddFeature}>Add Feature</Button>
-          </Form.Group>
+          {/* Conditional rendering for Serialization */}
+          {type === 'predictive' && engine === 'docker' && language === 'Python3' && (
+            <Form.Group className="mb-3">
+              <Form.Label>Serialization</Form.Label>
+              <Form.Select value={serialization} onChange={(e) => setSerialization(e.target.value)}>
+                <option value="joblib">joblib</option>
+                <option value="pickle">pickle</option>
+              </Form.Select>
+            </Form.Group>
+          )}
+
+          {/* Conditional rendering for Features */}
+          {type === 'predictive' && (
+            <Form.Group className="mb-3">
+              <Form.Label>Features</Form.Label>
+              {features.map((feature, index) => (
+                <div key={index} className="d-flex mb-2">
+                  <Form.Control
+                    type="text"
+                    placeholder="Name"
+                    value={feature.name}
+                    onChange={(e) => {
+                      const newFeatures = [...features];
+                      newFeatures[index].name = e.target.value;
+                      setFeatures(newFeatures);
+                    }}
+                    required
+                  />
+                  <Form.Select
+                    value={feature.type}
+                    onChange={(e) => {
+                      const newFeatures = [...features];
+                      newFeatures[index].type = e.target.value;
+                      setFeatures(newFeatures);
+                    }}
+                    required
+                  >
+                    <option value="int">int</option>
+                    <option value="float">float</option>
+                    <option value="boolean">bool</option>
+                    <option value="string">string</option>
+                  </Form.Select>
+                  <Button variant="danger" onClick={() => handleRemoveFeature(index)}>Remove</Button>
+                </div>
+              ))}
+              <Button variant="primary" onClick={handleAddFeature}>Add Feature</Button>
+            </Form.Group>
+          )}
 
           <Form.Group className="mb-3">
             <Form.Label>Dependencies</Form.Label>

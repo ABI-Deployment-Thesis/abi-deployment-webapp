@@ -1,12 +1,13 @@
-// src/components/ModelRunner.js
+// src/components/ModelRunner/ModelRunner.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaCheckCircle, FaTimesCircle, FaSpinner } from 'react-icons/fa';
 import { Button } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
-import '../App.css'; // Import the CSS file
-import RunModelModal from '../components/RunModelModal'; // Import the modal component
-import ModelRunDetailsModal from '../components/ModelRunDetailsModal'; // Import the new modal component
+import './ModelRunner.css';
+import RunModelModal from '../../components/RunModelModal/RunModelModal';
+import ModelRunDetailsModal from '../../components/ModelRunDetailsModal/ModelRunDetailsModal';
+import { API_ENDPOINTS } from '../../config/config';
 
 function ModelRunner() {
   const [modelRuns, setModelRuns] = useState([]);
@@ -19,7 +20,7 @@ function ModelRunner() {
   const fetchModelRuns = async (modelId = '') => {
     const token = localStorage.getItem('token');
     try {
-      const url = modelId ? `http://127.0.0.1:3003/model-runs?model_id=${modelId}` : 'http://127.0.0.1:3003/model-runs';
+      const url = modelId ? `${API_ENDPOINTS.MODEL_RUNS}?model_id=${modelId}` : API_ENDPOINTS.MODEL_RUNS;
       const response = await axios.get(url, {
         headers: {
           'Authorization': `Bearer ${token}`
