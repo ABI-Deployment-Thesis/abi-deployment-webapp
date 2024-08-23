@@ -16,9 +16,7 @@ function SignIn() {
       const response = await axios.post(API_ENDPOINTS.SIGNIN, { email, password });
 
       if (response.status === 200) {
-        const data = response.data;
-        localStorage.setItem('token', data.message);
-        navigate('/model-management');
+        localStorage.setItem('token', response.data.message);
         window.location.reload();
       } else {
         alert('Sign in failed');
