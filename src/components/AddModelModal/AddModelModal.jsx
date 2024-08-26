@@ -9,6 +9,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
   const [type, setType] = useState('predictive');
   const [engine, setEngine] = useState('docker');
   const [language, setLanguage] = useState('Python3');
+  const [dockerTag, setDockerTag] = useState('3.9');
   const [serialization, setSerialization] = useState('joblib');
   const [features, setFeatures] = useState([{ name: '', type: 'int' }]);
   const [dependencies, setDependencies] = useState([{ library: '', version: '' }]);
@@ -37,6 +38,17 @@ function AddModelModal({ show, handleClose, refreshModels }) {
     }
   };
 
+  const handleLanguageChange = (e) => {
+    const selectedLanguage = e.target.value;
+    setLanguage(selectedLanguage);
+
+    if (selectedLanguage === 'R') {
+      setDockerTag('24.04');
+    } else if (selectedLanguage === 'Python3') {
+      setDockerTag('3.9');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -47,6 +59,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
 
     if (engine === 'docker') {
       formData.append('language', language);
+      formData.append('docker_tag', dockerTag);
       formData.append('mem_limit', memLimit);
       formData.append('cpu_percentage', cpuPercentage);
     }
@@ -108,10 +121,20 @@ function AddModelModal({ show, handleClose, refreshModels }) {
             <>
               <Form.Group className="mb-3">
                 <Form.Label>Language</Form.Label>
-                <Form.Select value={language} onChange={(e) => setLanguage(e.target.value)}>
+                <Form.Select value={language} onChange={(e) => handleLanguageChange(e)}>
                   <option value="Python3">Python3</option>
                   {type === 'predictive' && <option value="R">R</option>}
                 </Form.Select>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Docker Tag</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={dockerTag}
+                  onChange={(e) => setDockerTag(e.target.value)}
+                  required
+                />
               </Form.Group>
 
               <Form.Group className="mb-3">
