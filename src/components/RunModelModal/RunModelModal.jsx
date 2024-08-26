@@ -1,6 +1,6 @@
 // src/components/RunModelModal/RunModelModal.jsx
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Modal, Button, Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../../config/config';
 
@@ -12,6 +12,7 @@ const RunModelModal = ({ show, handleClose, refreshModelRuns }) => {
   const [inputValues, setInputValues] = useState({});
   const [file, setFile] = useState(null);
   const [fileError, setFileError] = useState('');
+  const [formError, setFormError] = useState('');
 
   const token = localStorage.getItem('token');
 
@@ -22,7 +23,12 @@ const RunModelModal = ({ show, handleClose, refreshModelRuns }) => {
       });
       setModels(response.data);
     } catch (error) {
-      console.error('Error fetching models:', error);
+      const errorMessage = error.response?.data?.error;
+      setFormError(
+        Array.isArray(errorMessage)
+          ? errorMessage.map(err => err.msg).join(', ')
+          : errorMessage || 'Failed to load models. Please try again.'
+      );
     }
   }, [token]);
 
@@ -40,7 +46,12 @@ const RunModelModal = ({ show, handleClose, refreshModelRuns }) => {
         setFeatures(features);
         setModelType(type);
       } catch (error) {
-        console.error('Error fetching model details:', error);
+        const errorMessage = error.response?.data?.error;
+        setFormError(
+          Array.isArray(errorMessage)
+            ? errorMessage.map(err => err.msg).join(', ')
+            : errorMessage || 'Failed to load model details. Please try again.'
+        );
       }
     }
   }, [selectedModel, token]);
@@ -54,6 +65,7 @@ const RunModelModal = ({ show, handleClose, refreshModelRuns }) => {
     setInputValues({});
     setFile(null);
     setFileError('');
+    setFormError('');
   };
 
   const handleInputChange = (feature, event) => {
@@ -105,7 +117,7 @@ const RunModelModal = ({ show, handleClose, refreshModelRuns }) => {
         model_id: selectedModel,
         input_features: features.map(feature => ({
           name: feature.name,
-          value: inputValues[feature.name] == '0' ? 0 : (inputValues[feature.name] || '')
+          value: inputValues[feature.name] === '0' || inputValues[feature.name] === '0.0' ? 0 : (inputValues[feature.name] || '')
         }))
       };
       headers['Content-Type'] = 'application/json';
@@ -125,9 +137,24 @@ const RunModelModal = ({ show, handleClose, refreshModelRuns }) => {
       handleClose();
       refreshModelRuns();
     } catch (error) {
-      console.error('Error running model:', error);
+      const errorMessage = error.response?.data?.error;
+      setFormError(
+        Array.isArray(errorMessage)
+          ? errorMessage.map(err => err.msg).join(', ')
+          : errorMessage || 'Failed to run the model. Please try again.'
+      );
     }
   };
+
+  useEffect(() => {
+    if (show) {
+      const params = new URLSearchParams(window.location.search);
+      const modelId = params.get('model_id');
+      if (modelId && models.length > 0) {
+        setSelectedModel(modelId);
+      }
+    }
+  }, [show, models]);
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -145,6 +172,8 @@ const RunModelModal = ({ show, handleClose, refreshModelRuns }) => {
               ))}
             </Form.Control>
           </Form.Group>
+
+          {selectedModel && <br />}
 
           {modelType === 'predictive' && features.map(feature => (
             <Form.Group controlId={`feature-${feature.name}`} key={feature._id}>
@@ -167,6 +196,10 @@ const RunModelModal = ({ show, handleClose, refreshModelRuns }) => {
               {fileError && <Form.Text className="text-danger">{fileError}</Form.Text>}
             </Form.Group>
           )}
+
+          <br />
+
+          {formError && <Alert variant="danger">{formError}</Alert>}
 
           <Button variant="primary" type="submit">Run</Button>
         </Form>

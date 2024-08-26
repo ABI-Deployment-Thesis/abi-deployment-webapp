@@ -1,10 +1,11 @@
 // src/pages/ModelManagement/ModelManagement.jsx
 import React, { useEffect, useState } from 'react';
+import { Table, Button } from 'react-bootstrap';
 import axios from 'axios';
 import AddModelModal from '../../components/AddModelModal/AddModelModal';
-import { Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { API_ENDPOINTS } from '../../config/config';
+import './ModelManagement.css';
 
 function ModelManagement() {
   const [models, setModels] = useState([]);
@@ -51,17 +52,38 @@ function ModelManagement() {
     navigate(`/model-runner?model_id=${modelId}`);
   };
 
+  const getSortArrow = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === 'asc' ? '↑' : '↓';
+    }
+    return '';
+  };
+
   return (
     <div className="container">
       <h1>Model Management</h1>
       <Button variant="primary" onClick={handleShowModal}>Add New Model</Button>
-      <table className="table mt-3">
+      <Table>
         <thead>
           <tr>
-            <th onClick={() => handleSort('name')}>Name</th>
-            <th onClick={() => handleSort('type')}>Type</th>
-            <th onClick={() => handleSort('engine')}>Engine</th>
-            <th onClick={() => handleSort('created_at')}>Created At</th>
+            <th onClick={() => handleSort('name')}>
+              Name {getSortArrow('name')}
+            </th>
+            <th onClick={() => handleSort('type')}>
+              Type {getSortArrow('type')}
+            </th>
+            <th onClick={() => handleSort('engine')}>
+              Engine {getSortArrow('engine')}
+            </th>
+            <th onClick={() => handleSort('language')}>
+              Language {getSortArrow('language')}
+            </th>
+            <th onClick={() => handleSort('serialization')}>
+              Serialization {getSortArrow('serialization')}
+            </th>
+            <th onClick={() => handleSort('created_at')}>
+              Created On {getSortArrow('created_at')}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -70,11 +92,13 @@ function ModelManagement() {
               <td>{model.name}</td>
               <td>{model.type}</td>
               <td>{model.engine}</td>
+              <td>{model.language}</td>
+              <td>{model.serialization}</td>
               <td>{new Date(model.created_at).toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
       <AddModelModal show={showModal} handleClose={handleCloseModal} refreshModels={fetchModels} />
     </div>
   );

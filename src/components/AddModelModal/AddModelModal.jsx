@@ -12,8 +12,10 @@ function AddModelModal({ show, handleClose, refreshModels }) {
   const [serialization, setSerialization] = useState('joblib');
   const [features, setFeatures] = useState([{ name: '', type: 'int' }]);
   const [dependencies, setDependencies] = useState([{ library: '', version: '' }]);
+  const [memLimit, setMemLimit] = useState('256M');
+  const [cpuPercentage, setCpuPercentage] = useState(50);
   const [file, setFile] = useState(null);
-  const [error, setError] = useState(null);
+  const [formError, setFormError] = useState(null);
 
   const handleAddFeature = () => setFeatures([...features, { name: '', type: 'int' }]);
   const handleRemoveFeature = (index) => setFeatures(features.filter((_, i) => i !== index));
@@ -23,15 +25,15 @@ function AddModelModal({ show, handleClose, refreshModels }) {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    const allowedExtensions = ['.py', '.sav', '.rds', '.zip'];
+    const allowedExtensions = ['.pkl', '.sav', '.rds', '.zip'];
     const fileExtension = selectedFile ? `.${selectedFile.name.split('.').pop()}` : '';
 
     if (allowedExtensions.includes(fileExtension)) {
       setFile(selectedFile);
-      setError(null);
+      setFormError(null);
     } else {
       setFile(null);
-      setError('Only .py, .sav, .rds, and .zip files are allowed.');
+      setFormError('Only .pkl, .sav, .rds, and .zip files are allowed.');
     }
   };
 
@@ -45,6 +47,8 @@ function AddModelModal({ show, handleClose, refreshModels }) {
 
     if (engine === 'docker') {
       formData.append('language', language);
+      formData.append('mem_limit', memLimit);
+      formData.append('cpu_percentage', cpuPercentage);
     }
 
     if (type === 'predictive') {
@@ -65,7 +69,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
       handleClose();
     } catch (error) {
       const errorMessage = error.response?.data?.error;
-      setError(
+      setFormError(
         Array.isArray(errorMessage)
           ? errorMessage.map(err => err.msg).join(', ')
           : errorMessage || 'An unexpected error occurred.'
@@ -79,7 +83,6 @@ function AddModelModal({ show, handleClose, refreshModels }) {
         <Modal.Title>Add New Model</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Name</Form.Label>
@@ -98,18 +101,41 @@ function AddModelModal({ show, handleClose, refreshModels }) {
             <Form.Label>Engine</Form.Label>
             <Form.Select value={engine} onChange={(e) => setEngine(e.target.value)}>
               <option value="docker">Docker</option>
-              <option value="test">Test</option>
             </Form.Select>
           </Form.Group>
 
           {engine === 'docker' && (
-            <Form.Group className="mb-3">
-              <Form.Label>Language</Form.Label>
-              <Form.Select value={language} onChange={(e) => setLanguage(e.target.value)}>
-                <option value="Python3">Python3</option>
-                <option value="R">R</option>
-              </Form.Select>
-            </Form.Group>
+            <>
+              <Form.Group className="mb-3">
+                <Form.Label>Language</Form.Label>
+                <Form.Select value={language} onChange={(e) => setLanguage(e.target.value)}>
+                  <option value="Python3">Python3</option>
+                  {type === 'predictive' && <option value="R">R</option>}
+                </Form.Select>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Memory Limit</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={memLimit}
+                  onChange={(e) => setMemLimit(e.target.value)}
+                  placeholder="e.g., 256M"
+                  required
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>CPU Percentage</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={cpuPercentage}
+                  onChange={(e) => setCpuPercentage(e.target.value)}
+                  placeholder="e.g., 50"
+                  required
+                />
+              </Form.Group>
+            </>
           )}
 
           {type === 'predictive' && engine === 'docker' && language === 'Python3' && (
@@ -199,6 +225,8 @@ function AddModelModal({ show, handleClose, refreshModels }) {
             <Form.Label>File</Form.Label>
             <Form.Control type="file" onChange={handleFileChange} required />
           </Form.Group>
+
+          {formError && <Alert variant="danger">{formError}</Alert>}
 
           <Button variant="primary" type="submit">Submit</Button>
         </Form>

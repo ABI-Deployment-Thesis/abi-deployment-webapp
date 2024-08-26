@@ -1,0 +1,37 @@
+/* src/components/SignIn/SignIn.css */
+
+.sign-in-container {
+    max-width: 400px;
+    /* Adjust the max-width as needed */
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.sign-in-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.mb-2 {
+    margin-bottom: 1rem;
+    /* Reduced margin for compact spacing */
+}
+
+.form-label {
+    margin-bottom: 0.5rem;
+    /* Reduced margin for compact spacing */
+}
+
+.form-control-sm {
+    font-size: 0.875rem;
+    /* Smaller font size for compact input */
+    padding: 0.375rem 0.75rem;
+    /* Adjust padding for smaller input */
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    /* Smaller padding for compact button */
+    font-size: 0.875rem;
+    /* Smaller font size for button */
+}
