@@ -47,9 +47,9 @@ function ModelRunner() {
 
     const intervalId = setInterval(() => {
       fetchModelRuns(modelId);
-    }, 3000);
+    }, 3000); // Update every 3 seconds
 
-    return () => clearInterval(intervalId);
+    return () => clearInterval(intervalId); // Clean up interval on component unmount
   }, [location.search]);
 
   const getStateIcon = (state) => {

@@ -9,28 +9,31 @@ const ModelRunDetailsModal = ({ show, handleClose, runId }) => {
   const [runDetails, setRunDetails] = useState(null);
   const [modelType, setModelType] = useState('');
 
+  const fetchRunDetails = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const { data: runData } = await axios.get(`${API_ENDPOINTS.MODEL_RUNS}/${runId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const { data: modelData } = await axios.get(`${API_ENDPOINTS.MODELS}/${runData.model_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setRunDetails(runData);
+      setModelType(modelData.type);
+    } catch (error) {
+      console.error('Error fetching run details:', error);
+      setRunDetails(null);
+    }
+  };
+
   useEffect(() => {
-    const fetchRunDetails = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const { data: runData } = await axios.get(`${API_ENDPOINTS.MODEL_RUNS}/${runId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const { data: modelData } = await axios.get(`${API_ENDPOINTS.MODELS}/${runData.model_id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setRunDetails(runData);
-        setModelType(modelData.type);
-      } catch (error) {
-        console.error('Error fetching run details:', error);
-        setRunDetails(null);
-      }
-    };
-
     if (show && runId) {
       fetchRunDetails();
+      const intervalId = setInterval(fetchRunDetails, 3000); // Update every 3 seconds
+
+      return () => clearInterval(intervalId); // Clean up interval on component unmount
     }
   }, [show, runId]);
 
@@ -78,7 +81,7 @@ const ModelRunDetailsModal = ({ show, handleClose, runId }) => {
               <>
                 <strong>Result:</strong>
                 <pre>{runDetails.result}</pre>
-              </>  
+              </>
             )}
 
             {modelType !== 'optimization' && (
