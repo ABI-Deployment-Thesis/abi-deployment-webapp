@@ -43,7 +43,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
     setLanguage(selectedLanguage);
 
     if (selectedLanguage === 'R') {
-      setDockerTag('24.04');
+      setDockerTag('4.1.3');
     } else if (selectedLanguage === 'Python3') {
       setDockerTag('3.9');
     }

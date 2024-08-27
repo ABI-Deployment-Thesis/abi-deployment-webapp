@@ -61,20 +61,26 @@ const ModelRunDetailsModal = ({ show, handleClose, runId }) => {
             <strong>State: <span className={stateClass}>{runDetails.state}</span></strong><br />
             <strong>Created At:</strong> {new Date(runDetails.createdAt).toLocaleString()}<br />
             <strong>Updated At:</strong> {new Date(runDetails.updatedAt).toLocaleString()}<br />
-            {runDetails.container_id !== undefined && runDetails.container_id !== null && (
+            {runDetails.container_id !== undefined && runDetails.container_id !== null && runDetails.container_id !== '' && (
               <>
                 <strong>Container ID:</strong> {runDetails.container_id}<br />
               </>
             )}
 
-            {runDetails.container_exit_code !== undefined && runDetails.container_exit_code !== null && (
+            {(runDetails.state == 'failed' || runDetails.state == 'finished') && (
               <>
                 <strong>Container Exit Code:</strong> {runDetails.container_exit_code}<br />
               </>
             )}
             <br />
-            <strong>Result:</strong>
-            <pre>{runDetails.result}</pre>
+
+            {(runDetails.state == 'failed' || runDetails.state == 'finished') && (
+              <>
+                <strong>Result:</strong>
+                <pre>{runDetails.result}</pre>
+              </>  
+            )}
+
             {modelType !== 'optimization' && (
               <>
                 <strong>Input Features:</strong>
