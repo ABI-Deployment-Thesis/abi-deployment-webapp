@@ -14,7 +14,7 @@
 
 <h2 align="center">ABI Deployment Thesis - Web Application</h2>
 
-Welcome to the abi-deployment-webapp repository! This project is a key part of a master's thesis at the University of Minho. It's a Proof of Concept for a proposed architecture designed to deploy and integrate intelligent models within ABI (Adaptive Business Intelligence) systems.
+Welcome to the abi-deployment-webapp repository! This project is a key part of a master's thesis at the University of Minho. It's a Proof of Concept for a proposed architecture designed to deploy and integrate intelligent models within Adaptive Business Intelligence (ABI) systems.
 
 **This repository provides a web application that serves as the user interface for interacting with the PoC.**
 

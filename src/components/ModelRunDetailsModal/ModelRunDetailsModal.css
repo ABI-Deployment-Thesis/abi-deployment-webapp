@@ -1,6 +1,33 @@
+/* src/components/ModelRunDetailsModal/ModelRunDetailsModal.css */
+
 .custom-modal-width {
   max-width: 80%;
   /* Adjust the percentage as needed */
   width: 800px;
   /* Or set a fixed width */
+}
+
+.state-queue {
+  color: gray;
+}
+
+.state-building {
+  color: #0d6efd;
+}
+
+.state-running {
+  color: orange;
+}
+
+.state-finished {
+  color: green;
+}
+
+.state-failed {
+  color: red;
+}
+
+.modal-body {
+  word-wrap: break-word;
+  /* Ensure long words break and wrap */
 }

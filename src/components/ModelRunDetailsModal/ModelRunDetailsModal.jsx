@@ -9,28 +9,31 @@ const ModelRunDetailsModal = ({ show, handleClose, runId }) => {
   const [runDetails, setRunDetails] = useState(null);
   const [modelType, setModelType] = useState('');
 
+  const fetchRunDetails = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const { data: runData } = await axios.get(`${API_ENDPOINTS.MODEL_RUNS}/${runId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const { data: modelData } = await axios.get(`${API_ENDPOINTS.MODELS}/${runData.model_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setRunDetails(runData);
+      setModelType(modelData.type);
+    } catch (error) {
+      console.error('Error fetching run details:', error);
+      setRunDetails(null);
+    }
+  };
+
   useEffect(() => {
-    const fetchRunDetails = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const { data: runData } = await axios.get(`${API_ENDPOINTS.MODEL_RUNS}/${runId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const { data: modelData } = await axios.get(`${API_ENDPOINTS.MODEL}/${runData.model_id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setRunDetails(runData);
-        setModelType(modelData.type);
-      } catch (error) {
-        console.error('Error fetching run details:', error);
-        setRunDetails(null);
-      }
-    };
-
     if (show && runId) {
       fetchRunDetails();
+      const intervalId = setInterval(fetchRunDetails, 3000); // Update every 3 seconds
+
+      return () => clearInterval(intervalId); // Clean up interval on component unmount
     }
   }, [show, runId]);
 
@@ -47,6 +50,8 @@ const ModelRunDetailsModal = ({ show, handleClose, runId }) => {
     ));
   };
 
+  const stateClass = runDetails ? `state-${runDetails.state}` : '';
+
   return (
     <Modal show={show} onHide={handleClose} dialogClassName="custom-modal-width">
       <Modal.Header closeButton>
@@ -55,18 +60,34 @@ const ModelRunDetailsModal = ({ show, handleClose, runId }) => {
       <Modal.Body>
         {runDetails ? (
           <>
-            <h5>Model ID: {runDetails.model_id}</h5>
-            <h5>State: {runDetails.state}</h5>
-            <h5>Created At: {new Date(runDetails.createdAt).toLocaleString()}</h5>
-            <h5>Updated At: {new Date(runDetails.updatedAt).toLocaleString()}</h5>
-            <h5>Container ID: {runDetails.container_id}</h5>
-            <h5>Container Exit Code: {runDetails.container_exit_code}</h5>
-            <h5>Result:</h5>
-            <pre>{runDetails.result}</pre>
+            <strong>Model ID:</strong> {runDetails.model_id}<br />
+            <strong>State: <span className={stateClass}>{runDetails.state}</span></strong><br />
+            <strong>Created At:</strong> {new Date(runDetails.createdAt).toLocaleString()}<br />
+            <strong>Updated At:</strong> {new Date(runDetails.updatedAt).toLocaleString()}<br />
+            {runDetails.container_id !== undefined && runDetails.container_id !== null && runDetails.container_id !== '' && (
+              <>
+                <strong>Container ID:</strong> {runDetails.container_id}<br />
+              </>
+            )}
+
+            {(runDetails.state == 'failed' || runDetails.state == 'finished') && (
+              <>
+                <strong>Container Exit Code:</strong> {runDetails.container_exit_code}<br />
+              </>
+            )}
+            <br />
+
+            {(runDetails.state == 'failed' || runDetails.state == 'finished') && (
+              <>
+                <strong>Result:</strong>
+                <pre>{runDetails.result}</pre>
+              </>
+            )}
+
             {modelType !== 'optimization' && (
               <>
-                <h5>Input Features:</h5>
-                <Table bordered>
+                <strong>Input Features:</strong>
+                <Table>
                   <thead>
                     <tr>
                       <th>Name</th>
