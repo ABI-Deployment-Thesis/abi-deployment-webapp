@@ -20,6 +20,8 @@ COPY --from=build /app/dist /usr/share/nginx/html
 # Copy custom NGINX configuration file
 COPY default.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+COPY env.sh /docker-entrypoint.d/env.sh
+RUN chmod +x /docker-entrypoint.d/env.sh
 
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
