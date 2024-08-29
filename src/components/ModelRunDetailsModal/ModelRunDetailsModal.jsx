@@ -79,7 +79,7 @@ const ModelRunDetailsModal = ({ show, handleClose, runId }) => {
 
             {(runDetails.state == 'failed' || runDetails.state == 'finished') && (
               <>
-                <strong>Result:</strong>
+                <strong>{runDetails.state === 'failed' ? 'Logs:' : 'Result:'}</strong>
                 <pre>{runDetails.result}</pre>
               </>
             )}

@@ -9,7 +9,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
   const [type, setType] = useState('predictive');
   const [engine, setEngine] = useState('docker');
   const [language, setLanguage] = useState('Python3');
-  const [dockerTag, setDockerTag] = useState('3.9');
+  const [dockerTag, setDockerTag] = useState('3.9.6');
   const [serialization, setSerialization] = useState('joblib');
   const [features, setFeatures] = useState([{ name: '', type: 'int' }]);
   const [dependencies, setDependencies] = useState([{ library: '', version: '' }]);
