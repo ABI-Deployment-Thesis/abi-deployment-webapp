@@ -5,9 +5,12 @@ FROM node@sha256:ed9736a13b88ba55cbc08c75c9edac8ae7f72840482e40324670b299336680c
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm ci
 
 COPY . .
+
+# Rename .env.docker to .env
+RUN mv .env.docker .env
 
 RUN npm run build
 
@@ -20,6 +23,8 @@ COPY --from=build /app/dist /usr/share/nginx/html
 # Copy custom NGINX configuration file
 COPY default.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+COPY env.docker.sh /docker-entrypoint.d/env.docker.sh
+RUN chmod +x /docker-entrypoint.d/env.docker.sh
 
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
