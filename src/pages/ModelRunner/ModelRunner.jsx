@@ -15,7 +15,7 @@ function ModelRunner() {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedRunId, setSelectedRunId] = useState(null);
   const [selectedModelId, setSelectedModelId] = useState(null);
-  const [sortConfig, setSortConfig] = useState({ key: 'updatedAt', direction: 'desc' });
+  const [sortConfig, setSortConfig] = useState({ key: 'updated_at', direction: 'desc' });
   const location = useLocation();
 
   const fetchModelRuns = async (modelId = '') => {
@@ -29,7 +29,7 @@ function ModelRunner() {
       });
 
       const runsWithDuration = response.data.map(run => {
-        const durationMs = new Date(run.updatedAt) - new Date(run.createdAt);
+        const durationMs = new Date(run.updated_at) - new Date(run.created_at);
         return { ...run, durationMs };
       });
 
@@ -134,8 +134,8 @@ function ModelRunner() {
             <th onClick={() => handleSort('model_engine')}>
               Engine {getSortArrow('model_engine')}
             </th>
-            <th onClick={() => handleSort('updatedAt')}>
-              Last Updated On {getSortArrow('updatedAt')}
+            <th onClick={() => handleSort('updated_at')}>
+              Last Updated On {getSortArrow('updated_at')}
             </th>
             <th onClick={() => handleSort('duration')}>
               Duration {getSortArrow('duration')}
@@ -151,8 +151,8 @@ function ModelRunner() {
               <td>{run.model_name}</td>
               <td>{run.model_type}</td>
               <td>{run.model_engine}</td>
-              <td>{new Date(run.updatedAt).toLocaleString()}</td>
-              <td>{formatDuration(run.createdAt, run.updatedAt)}</td>
+              <td>{new Date(run.updated_at).toLocaleString()}</td>
+              <td>{formatDuration(run.created_at, run.updated_at)}</td>
               <td>{getStateIcon(run.state)}</td>
             </tr>
           ))}
