@@ -62,25 +62,14 @@ const ModelRunDetailsModal = ({ show, handleClose, runId }) => {
           <>
             <strong>Model ID:</strong> {runDetails.model_id}<br />
             <strong>State: <span className={stateClass}>{runDetails.state}</span></strong><br />
-            <strong>Created At:</strong> {new Date(runDetails.createdAt).toLocaleString()}<br />
-            <strong>Updated At:</strong> {new Date(runDetails.updatedAt).toLocaleString()}<br />
-            {runDetails.container_id !== undefined && runDetails.container_id !== null && runDetails.container_id !== '' && (
-              <>
-                <strong>Container ID:</strong> {runDetails.container_id}<br />
-              </>
-            )}
-
-            {(runDetails.state == 'failed' || runDetails.state == 'finished') && (
-              <>
-                <strong>Container Exit Code:</strong> {runDetails.container_exit_code}<br />
-              </>
-            )}
+            <strong>Created At:</strong> {new Date(runDetails.created_at).toLocaleString()}<br />
+            <strong>Updated At:</strong> {new Date(runDetails.updated_at).toLocaleString()}<br />
             <br />
 
-            {(runDetails.state == 'failed' || runDetails.state == 'finished') && (
+            {(runDetails.state == 'finished' || runDetails.state == 'failed') && (
               <>
-                <strong>{runDetails.state === 'failed' ? 'Logs:' : 'Result:'}</strong>
-                <pre>{runDetails.result}</pre>
+                <strong>{runDetails.state === 'finished' ? 'Result:' : 'Logs:'}</strong>
+                <pre>{runDetails.state === 'finished' ? runDetails.result : runDetails.logs}</pre>
               </>
             )}
 

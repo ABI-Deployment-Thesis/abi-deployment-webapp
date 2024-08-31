@@ -9,12 +9,12 @@ function AddModelModal({ show, handleClose, refreshModels }) {
   const [type, setType] = useState('predictive');
   const [engine, setEngine] = useState('docker');
   const [language, setLanguage] = useState('Python3');
-  const [dockerTag, setDockerTag] = useState('3.9.6');
+  const [languageVersion, setLanguageVersion] = useState('3.9.6');
+  const [memLimit, setMemLimit] = useState('256M');
+  const [cpuPercentage, setCpuPercentage] = useState(50);
   const [serialization, setSerialization] = useState('joblib');
   const [features, setFeatures] = useState([{ name: '', type: 'int' }]);
   const [dependencies, setDependencies] = useState([{ library: '', version: '' }]);
-  const [memLimit, setMemLimit] = useState('256M');
-  const [cpuPercentage, setCpuPercentage] = useState(50);
   const [file, setFile] = useState(null);
   const [formError, setFormError] = useState(null);
 
@@ -43,9 +43,9 @@ function AddModelModal({ show, handleClose, refreshModels }) {
     setLanguage(selectedLanguage);
 
     if (selectedLanguage === 'R') {
-      setDockerTag('4.1.3');
+      setLanguageVersion('4.1.3');
     } else if (selectedLanguage === 'Python3') {
-      setDockerTag('3.9');
+      setLanguageVersion('3.9.6');
     }
   };
 
@@ -59,7 +59,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
 
     if (engine === 'docker') {
       formData.append('language', language);
-      formData.append('docker_tag', dockerTag);
+      formData.append('language_version', languageVersion);
       formData.append('mem_limit', memLimit);
       formData.append('cpu_percentage', cpuPercentage);
     }
@@ -128,11 +128,11 @@ function AddModelModal({ show, handleClose, refreshModels }) {
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>Docker Tag</Form.Label>
+                <Form.Label>Language Version</Form.Label>
                 <Form.Control
                   type="text"
-                  value={dockerTag}
-                  onChange={(e) => setDockerTag(e.target.value)}
+                  value={languageVersion}
+                  onChange={(e) => setLanguageVersion(e.target.value)}
                   required
                 />
               </Form.Group>
