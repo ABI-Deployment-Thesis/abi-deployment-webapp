@@ -123,7 +123,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
                 <Form.Label>Language</Form.Label>
                 <Form.Select value={language} onChange={(e) => handleLanguageChange(e)}>
                   <option value="Python3">Python3</option>
-                  {type === 'predictive' && <option value="R">R</option>}
+                  <option value="R">R</option>
                 </Form.Select>
               </Form.Group>
 
