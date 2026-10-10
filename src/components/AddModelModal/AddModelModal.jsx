@@ -149,7 +149,7 @@ function AddModelModal({ show, handleClose, refreshModels }) {
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label>CPU Percentage</Form.Label>
+                <Form.Label>CPU Limit (% of a core)</Form.Label>
                 <Form.Control
                   type="number"
                   value={cpuPercentage}
